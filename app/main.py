@@ -12,8 +12,9 @@ from schemas import Calculate, Task, TaskCreated, State, Operation
 from worker import plus, minus, divide, multiply
 
 flower_url = os.environ.get("FLOWER_URL")
-sentry_sdk.init(dsn=os.environ.get("SENTRY_DSN"),
-                environment=os.environ.get("SENTRY_ENV"))
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_DSN"), environment=os.environ.get("SENTRY_ENV")
+)
 
 app = FastAPI()
 
@@ -46,12 +47,11 @@ def calculate_get(x: int, y: int, operation: Operation):
 def get_task_list(**kwargs):
     r = requests.get(
         f"{flower_url}/api/tasks",
-        params={
-            k: v for k,
-            v in kwargs.items() if v is not None})
+        params={k: v for k, v in kwargs.items() if v is not None},
+    )
     tasks = []
     for _, value in r.json().items():
-        value['task_id'] = value.pop('uuid')
+        value["task_id"] = value.pop("uuid")
         tasks.append(value)
     return tasks
 
@@ -59,9 +59,9 @@ def get_task_list(**kwargs):
 def get_task(task_id: str) -> Task:
     r = requests.get(f"{flower_url}/api/task/result/{task_id}")
     result = r.json()
-    result['task_id'] = result.pop('task-id')
-    if 'result' not in result:
-        result['result'] = None
+    result["task_id"] = result.pop("task-id")
+    if "result" not in result:
+        result["result"] = None
     return result
 
 

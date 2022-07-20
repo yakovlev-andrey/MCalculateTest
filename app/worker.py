@@ -14,10 +14,10 @@ celery_app.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND")
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
-    integrations=[
-        CeleryIntegration()],
+    integrations=[CeleryIntegration()],
     send_default_pii=True,
-    environment=os.environ.get("SENTRY_ENV"))
+    environment=os.environ.get("SENTRY_ENV"),
+)
 
 
 @celery_app.task(name="create_task")

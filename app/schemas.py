@@ -3,9 +3,7 @@ from pydantic import BaseModel
 
 from celery.states import PRECEDENCE
 
-State = enum.Enum(
-    'State', {
-        state: state for state in PRECEDENCE if state is not None})
+State = enum.Enum("State", {state: state for state in PRECEDENCE if state is not None})
 
 
 class Task(BaseModel):
@@ -19,10 +17,10 @@ class TaskCreated(BaseModel):
 
 
 class Operation(enum.Enum):
-    PLUS = '+'
-    MINUS = '-'
-    DIVIDE = '/'
-    MULTIPLY = '*'
+    PLUS = "+"
+    MINUS = "-"
+    DIVIDE = "/"
+    MULTIPLY = "*"
 
 
 class Calculate(BaseModel):
