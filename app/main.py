@@ -15,7 +15,29 @@ sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"), environment=os.environ.get("SENTRY_ENV")
 )
 
-app = FastAPI()
+description = """
+Test Task Calculate API to handle background processes. 🚀
+
+## Calculate
+
+* **calculate** - you can calculate two numbers, available operations: +, -, *, /.
+
+## Tasks
+
+* **List of tasks** - get list of existed tasks
+* **Get Task** - get task info by task_id
+"""
+
+app = FastAPI(
+    title="Test Task Calculate",
+    description=description,
+    version="0.0.1",
+    contact={
+        "name": "Andrey Yakovlev",
+        "email": "679008@gmail.com",
+    },
+    license_info={"name": "MIT License"},
+)
 
 
 def run_calculate_task(x: int, y: int, operation: Operation):
@@ -31,13 +53,25 @@ def run_calculate_task(x: int, y: int, operation: Operation):
     return calculate_task.id
 
 
-@app.post("/calculate", status_code=201, response_model=TaskCreated)
+@app.post(
+    "/calculate",
+    status_code=201,
+    response_model=TaskCreated,
+    tags=["calculate"],
+    name="Calculate two integers",
+)
 def calculate(payload: Calculate):
     task_id = run_calculate_task(payload.x, payload.y, payload.operation)
     return JSONResponse({"task_id": task_id})
 
 
-@app.get("/calculate", status_code=201, response_model=TaskCreated)
+@app.get(
+    "/calculate",
+    status_code=201,
+    response_model=TaskCreated,
+    tags=["calculate"],
+    name="Calculate two integers",
+)
 def calculate_get(x: int, y: int, operation: Operation):
     task_id = run_calculate_task(x, y, operation)
     return JSONResponse({"task_id": task_id})
@@ -55,21 +89,22 @@ def get_task_list(**kwargs):
 
 def get_task(task_id: str) -> Task:
     result = flower.task(task_id)
-    print(result)
     result["task_id"] = result.pop("task-id")
     if "result" not in result:
         result["result"] = None
     return result
 
 
-@app.get("/tasks", response_model=List[Task])
+@app.get("/tasks", response_model=List[Task], tags=["tasks"], name="Get list of task")
 def tasks(limit: int = None, offset: int = None, state: State = None):
     if state is not None:
         state = state.value
     return get_task_list(limit=limit, offset=offset, state=state)
 
 
-@app.get("/tasks/{task_id}", response_model=Task)
+@app.get(
+    "/tasks/{task_id}", response_model=Task, tags=["tasks"], name="Get task info by id"
+)
 def task(task_id: str):
     return get_task(task_id)
 
