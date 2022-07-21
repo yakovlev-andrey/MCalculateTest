@@ -30,8 +30,8 @@ class StrictInt(int):
 
     @classmethod
     def validate(cls, v):
-        if isinstance(v, float):
-            raise TypeError("Will not coerce float to int")
+        if not isinstance(v, int):
+            raise TypeError("value is not a valid integer")
         return v
 
 

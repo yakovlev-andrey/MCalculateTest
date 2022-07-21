@@ -6,7 +6,7 @@ import tests.flower_answers as flower_answers
 from worker import plus, minus, multiply, divide
 
 
-def assert_error_operation_not_valid_exists(error_msg):
+def assert_error_operation_not_valid_exists(error_msg: dict):
     operation_error_exists = False
     for detail in error_msg["detail"]:
         if "operation" in detail["loc"]:
@@ -17,8 +17,17 @@ def assert_error_operation_not_valid_exists(error_msg):
     ), f"Error operation not valid not exists. Error: {error_msg}"
 
 
+def assert_error_value_is_not_integer(error_msg: dict, int_name: str):
+    error_exists = False
+    for detail in error_msg["detail"]:
+        if int_name in detail["loc"]:
+            if "value is not a valid integer" in detail["msg"]:
+                error_exists = True
+    assert error_exists, f"Error operation not valid not exists. Error: {error_msg}"
+
+
 @pytest.mark.parametrize("operation", ["+", "-", "*", "/"])
-def test_get_calculate_if_all_valid_then_201(test_app, mocker, operation):
+def test_get_calculate_if_all_valid_then_201(test_app, mocker, operation: str):
     mocker.patch("main.run_calculate_task", return_value=flower_answers.task_created)
     params = {"x": 5, "y": 10, "operation": operation}
     response = test_app.get("/calculate", params=params)
@@ -27,7 +36,7 @@ def test_get_calculate_if_all_valid_then_201(test_app, mocker, operation):
 
 
 @pytest.mark.parametrize("operation", ["+", "-", "*", "/"])
-def test_post_calculate_if_all_valid_then_201(test_app, mocker, operation):
+def test_post_calculate_if_all_valid_then_201(test_app, mocker, operation: str):
     mocker.patch("main.run_calculate_task", return_value=flower_answers.task_created)
     params = {"x": 5, "y": 10, "operation": operation}
     response = test_app.post("/calculate", json=params)
@@ -53,22 +62,40 @@ def test_post_calculate_if_unsupported_operation_then_422(test_app, operation):
     assert response.status_code == 422
 
 
-@pytest.mark.parametrize(
-    "x,y", [(2.2, 1), (1, 2.2), ("aa", 1), (1, "aa"), (" ", 23), (23, " ")]
-)
-def test_post_calculate_if_x_y_not_integer_then_422(test_app, x, y):
-    params = {"x": x, "y": y, "operation": "+"}
+not_valid_integer = ["", " ", "a", 2.8, -24.9, "rrrr"]
+not_valid_integer_post_additional = ["2", "0"]
+
+
+@pytest.mark.parametrize("x", not_valid_integer)
+def test_get_calculate_if_x_not_integer_then_422(test_app, x):
+    params = {"x": x, "y": 2, "operation": "*"}
+    response = test_app.get("/calculate", params=params)
+    assert response.status_code == 422
+    assert_error_value_is_not_integer(response.json(), "x")
+
+
+@pytest.mark.parametrize("y", not_valid_integer)
+def test_get_calculate_if_y_not_integer_then_422(test_app, y):
+    params = {"x": 2, "y": y, "operation": "*"}
+    response = test_app.get("/calculate", params=params)
+    assert response.status_code == 422
+    assert_error_value_is_not_integer(response.json(), "y")
+
+
+@pytest.mark.parametrize("x", not_valid_integer + not_valid_integer_post_additional)
+def test_post_calculate_if_x_not_integer_then_422(test_app, x):
+    params = {"x": x, "y": 2, "operation": "*"}
     response = test_app.post("/calculate", json=params)
     assert response.status_code == 422
+    assert_error_value_is_not_integer(response.json(), "x")
 
 
-@pytest.mark.parametrize(
-    "x,y", [(2.2, 1), (1, 2.2), ("aa", 1), (1, "aa"), (" ", 23), (23, " ")]
-)
-def test_get_calculate_if_x_y_not_integer_then_422(test_app, x, y):
-    params = {"x": x, "y": y, "operation": "+"}
-    response = test_app.post("/calculate", params=params)
+@pytest.mark.parametrize("y", not_valid_integer + not_valid_integer_post_additional)
+def test_post_calculate_if_y_not_integer_then_422(test_app, y):
+    params = {"x": 2, "y": y, "operation": "*"}
+    response = test_app.post("/calculate", json=params)
     assert response.status_code == 422
+    assert_error_value_is_not_integer(response.json(), "y")
 
 
 def test_tasks_status(test_app, mocker):
