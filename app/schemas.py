@@ -3,7 +3,18 @@ from pydantic import BaseModel
 
 from celery.states import PRECEDENCE
 
-State = enum.Enum("State", {state: state for state in PRECEDENCE if state is not None})
+# State = enum.Enum("State", {state: state for state in PRECEDENCE if state is not None})
+
+
+class State(str, enum.Enum):
+    SUCCESS = "SUCCESS"
+    FAILURE = "FAILURE"
+    REVOKED = "REVOKED"
+    STARTED = "STARTED"
+    RECEIVED = "RECEIVED"
+    REJECTED = "REJECTED"
+    RETRY = "RETRY"
+    PENDING = "PENDING"
 
 
 class Task(BaseModel):
@@ -16,7 +27,7 @@ class TaskCreated(BaseModel):
     task_id: str
 
 
-class Operation(enum.Enum):
+class Operation(str, enum.Enum):
     PLUS = "+"
     MINUS = "-"
     DIVIDE = "/"
