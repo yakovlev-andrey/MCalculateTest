@@ -20,31 +20,25 @@ sentry_sdk.init(
 )
 
 
-@celery_app.task(name="create_task")
-def create_task(task_type):
-    sleep(int(task_type) * 10)
-    return True
-
-
 @celery_app.task(name="plus")
 def plus(x, y):
-    sleep(randint(1, 30))
+    sleep(randint(1, 5))
     return x + y
 
 
 @celery_app.task(name="minus")
 def minus(x, y):
-    sleep(randint(1, 30))
+    sleep(randint(1, 5))
     return x - y
 
 
 @celery_app.task(name="divide")
 def divide(x, y):
-    sleep(randint(1, 30))
+    sleep(randint(1, 5))
     return x / y
 
 
 @celery_app.task(name="multiply")
 def multiply(x, y):
-    sleep(randint(1, 30))
+    sleep(randint(1, 5))
     return x * y
