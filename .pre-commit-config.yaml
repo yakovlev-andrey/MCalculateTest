@@ -5,7 +5,6 @@ repos:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
-    -   id: name-tests-test
     -   id: requirements-txt-fixer
     -   id: no-commit-to-branch
         args: [--branch, master]
