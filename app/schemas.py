@@ -23,7 +23,19 @@ class Operation(enum.Enum):
     MULTIPLY = "*"
 
 
+class StrictInt(int):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if isinstance(v, float):
+            raise TypeError("Will not coerce float to int")
+        return v
+
+
 class Calculate(BaseModel):
-    x: int
-    y: int
+    x: StrictInt
+    y: StrictInt
     operation: Operation
