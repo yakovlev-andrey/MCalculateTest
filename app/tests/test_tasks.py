@@ -24,7 +24,6 @@ def test_if_task_not_exists_status_pending(test_app, mocker):
     mocker.patch(
         "flower.flower.task", return_value=deepcopy(flower_answers.task_not_exist)
     )
-    print(f"!!!!!!! - {flower_answers.task_not_exist}")
     response = test_app.get("/tasks/status_pending").json()
     assert response["state"] == "PENDING"
 
