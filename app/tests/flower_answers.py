@@ -134,3 +134,5 @@ tasks = {
 }
 
 task_not_exist = {"task-id": "task_not_exist_ID", "state": "PENDING"}
+
+task_created = {"task-id": "tasktask"}

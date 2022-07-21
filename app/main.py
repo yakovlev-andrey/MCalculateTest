@@ -55,26 +55,24 @@ def run_calculate_task(x: int, y: int, operation: Operation):
 
 @app.post(
     "/calculate",
-    status_code=201,
     response_model=TaskCreated,
     tags=["calculate"],
     name="Calculate two integers",
 )
 def calculate(payload: Calculate):
     task_id = run_calculate_task(payload.x, payload.y, payload.operation)
-    return JSONResponse({"task_id": task_id})
+    return JSONResponse({"task_id": task_id}, status_code=201)
 
 
 @app.get(
     "/calculate",
-    status_code=201,
     response_model=TaskCreated,
     tags=["calculate"],
     name="Calculate two integers",
 )
 def calculate_get(x: int, y: int, operation: Operation):
     task_id = run_calculate_task(x, y, operation)
-    return JSONResponse({"task_id": task_id})
+    return JSONResponse({"task_id": task_id}, status_code=201)
 
 
 def get_task_list(**kwargs):
